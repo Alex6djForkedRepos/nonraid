@@ -67,7 +67,7 @@ jobs:
           echo "artifacts_path=$(realpath ..)" >> $GITHUB_ENV
 
       - name: Upload Debian Package as Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonraid-dkms-${{ steps.get-dkms.outputs.version }}-${{ steps.get-build.outputs.build }}
           path: |
