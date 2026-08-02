@@ -63,8 +63,20 @@ jobs:
             # Install the latest available kernel headers
             apt-get install -y ${{ matrix.container.headers }}
 
-            # Verify headers are installed
-            KVERSION=$(ls /lib/modules/ | head -n1)
+            # Determine the latest installed kernel version with headers and a build directory
+            KVERSION=""
+            for HEADERS_PKG in $(dpkg-query -W -f='${db:Status-Status} ${Package}\n' 'linux-headers-[0-9]*' | awk '$1 == "installed" {print $2}' | sort -V -r); do
+              CANDIDATE="${HEADERS_PKG#linux-headers-}"
+              if [ -e "/lib/modules/$CANDIDATE/build" ]; then
+                KVERSION="$CANDIDATE"
+                break
+              fi
+            done
+            if [ -z "$KVERSION" ]; then
+              echo "Could not determine installed kernel headers package with a build directory" >&2
+              exit 1
+            fi
+            echo "KVERSION=$KVERSION" >> $GITHUB_ENV
             echo "Using kernel version: $KVERSION"
             ls -la /lib/modules/$KVERSION/build/ || echo "Build symlink not found"
             ls -la /usr/src/linux-headers-* || echo "No headers found in /usr/src"
@@ -72,8 +84,8 @@ jobs:
             # Install the latest available kernel headers
             pacman -S --noconfirm ${{ matrix.container.headers }}
 
-            # Verify headers are installed
             KVERSION=$(ls /lib/modules/ | head -n1)
+            echo "KVERSION=$KVERSION" >> $GITHUB_ENV
             echo "Using kernel version: $KVERSION"
             ls -la /lib/modules/$KVERSION/build/ || echo "Build symlink not found"
             ls -la /usr/src/linux-* || echo "No headers found in /usr/src"
@@ -97,7 +109,6 @@ jobs:
 
       - name: Build DKMS module
         run: |
-          KVERSION=$(ls /lib/modules/ | head -n1)
           echo "Building for kernel version: $KVERSION"
 
           # Try to build the module
@@ -111,7 +122,6 @@ jobs:
 
       - name: Verify module compilation
         run: |
-          KVERSION=$(ls /lib/modules/ | head -n1)
           MODULE_DIR="/var/lib/dkms/nonraid-dkms/$DKMS_VERSION/$KVERSION/$(uname -m)/module"
 
           echo "Checking for compiled modules in: $MODULE_DIR"
