@@ -48,7 +48,7 @@ jobs:
             pacman -S --noconfirm git base-devel dkms
           fi
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Extract DKMS version
         run: |
