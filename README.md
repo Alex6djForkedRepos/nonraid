@@ -21,10 +21,10 @@ Unlike in UnRAID, where the driver replaces the kernel's standard `md` driver, t
 While this is a fork, we try to keep the changes to driver minimal to make syncs with upstream easier. The driver currently has patches to rebrand and separate the module from `md` and from `raid6_pq`, and a couple of patches to prevent kernel crashes if starting the array without importing all disks first or importing in the "wrong" order.
 
 > [!WARNING]
-> :radioactive: This is an early-stage project, and while the driver and `nmdctl` management tool have been tested in both virtualized environments and some physical setups, data loss is still a possibility.
-> This is mainly intended for DIY enthusiasts comfortable with Linux command line usage.
->
+> This project requires being comfortable with the Linux command line, and carefully following how `nmdctl` is meant to be used.
 > Use at your own risk, and always have backups!
+>
+> That said, plenty of people are already running this in (homelab) production, including [one user with a half-petabyte array](https://github.com/qvr/nonraid/discussions/93).
 
 ## Table of Contents
 
